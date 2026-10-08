@@ -1,0 +1,16 @@
+{
+  "version": "prototype-v1",
+  "note": "Prototype phrase templates only. These are UI composition rules, not linguistic translation guarantees.",
+  "templates": [
+    {
+      "id": "needs_help",
+      "pattern": ["HELP"],
+      "output": "I need help."
+    },
+    {
+      "id": "needs_water",
+      "pattern": ["WATER", "PLEASE"],
+      "output": "Please give me water."
+    }
+  ]
+}

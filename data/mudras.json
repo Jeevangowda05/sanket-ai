@@ -1,0 +1,19 @@
+{
+  "context": "mudra",
+  "items": [
+    {
+      "id": "mudra_1",
+      "name": "Selected Mudra A",
+      "status": "pending_verification",
+      "source": null,
+      "note": "Meaning intentionally withheld until validated with reliable Bharatanatyam source material."
+    },
+    {
+      "id": "mudra_2",
+      "name": "Selected Mudra B",
+      "status": "pending_verification",
+      "source": null,
+      "note": "Knowledge base placeholder for verified interpretation workflow."
+    }
+  ]
+}
