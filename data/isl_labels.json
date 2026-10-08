@@ -1,0 +1,26 @@
+{
+  "context": "isl",
+  "items": [
+    {
+      "id": "isl_hello",
+      "name": "Hello",
+      "status": "pending_verification",
+      "source": null,
+      "note": "Gesture form must be validated against reliable ISL references before training labels are finalized."
+    },
+    {
+      "id": "isl_help",
+      "name": "Help",
+      "status": "pending_verification",
+      "source": null,
+      "note": "Prototype label candidate only; do not use as authoritative ISL definition."
+    },
+    {
+      "id": "isl_water",
+      "name": "Water",
+      "status": "pending_verification",
+      "source": null,
+      "note": "Pending signer-reviewed data collection."
+    }
+  ]
+}

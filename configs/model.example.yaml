@@ -1,0 +1,4 @@
+architecture: tcn
+input_size: 258
+num_classes: 20
+weights_path: models/latest.pt
