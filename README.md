@@ -11,7 +11,8 @@ SANKET AI is a single-platform prototype foundation for selected Indian Sign Lan
 - Reusable UI components for system status, context mode, confidence, detection cards/timeline, speech controls, and empty/loading/error states
 - Browser camera access and control hook with privacy notice and model-asset boundary
 - Browser SpeechSynthesis abstraction (speak/pause/cancel/voices)
-- Reconnect-safe WebSocket hook sending normalized landmark sequences only
+- Reconnect-safe WebSocket hook sending normalized v1 landmark sequences only
+- Browser MediaPipe Tasks tracking (`@mediapipe/tasks-vision`): hand/pose/face landmarkers, subtle canvas overlay, v1 feature schema (258/frame, face excluded), rolling 45-frame buffer sending 30-frame windows at ~10 Hz, tracker states unavailable/loading/ready/processing/error/stopped
 - FastAPI backend versioned endpoints and websocket with model-unavailable behavior
 - Video upload validation boundaries (extension/MIME/size/30-second duration via OpenCV)
 - ML package: base temporal model, TCN, Transformer skeleton, preprocessing and postprocessing utilities, explicit unavailable model loader
@@ -23,33 +24,35 @@ SANKET AI is a single-platform prototype foundation for selected Indian Sign Lan
 - No trained model weights are bundled.
 - No fabricated predictions, datasets, or metrics are produced.
 - Cultural meanings are not claimed when verification sources are missing.
-- MediaPipe Tasks assets are not bundled in this repository yet.
+- MediaPipe Tasks assets are not bundled in this repository yet (configure `NEXT_PUBLIC_MEDIAPIPE_*_MODEL_URL` or place `.task` files under `frontend/public/models/`; tracker stays `unavailable` until then).
 
 ## Local run instructions
 
 ### 1) Frontend
 
 ```bash
-cd /home/runner/work/sanket-ai/sanket-ai/frontend
+cd frontend
 cp .env.example .env.local
 npm install
 npm run dev
 ```
 
+Windows PowerShell: use `Copy-Item .env.example .env.local` instead of `cp`.
+
 ### 2) Backend
 
 ```bash
-cd /home/runner/work/sanket-ai/sanket-ai
 python -m venv .venv
 source .venv/bin/activate
 pip install -r backend/requirements.txt
-uvicorn app.main:app --app-dir backend --reload
+uvicorn app.main:app --app-dir backend --reload --port 8000
 ```
+
+Windows PowerShell: use `.\.venv\Scripts\Activate.ps1` instead of `source`.
 
 ### 3) ML tests
 
 ```bash
-cd /home/runner/work/sanket-ai/sanket-ai
 python -m venv .venv
 source .venv/bin/activate
 pip install -r ml/requirements.txt

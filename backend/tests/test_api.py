@@ -41,10 +41,14 @@ def test_signs_catalog() -> None:
 def test_predict_unavailable() -> None:
     body = {
         "context": "isl",
+        "feature_version": "v1",
+        "feature_count": 258,
         "sequence": [
             {
                 "timestamp_ms": 0,
-                "points": [{"x": 0.1, "y": 0.2, "z": 0.0}],
+                "feature_version": "v1",
+                "feature_count": 258,
+                "features": [0.0] * 258,
             }
         ],
     }

@@ -4,37 +4,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { AppContext, LiveOutgoingMessage } from "@/lib/types";
 import { isLiveOutgoingMessage } from "@/lib/validation";
+import { FEATURE_COUNT, FEATURE_VERSION, type FrameV1 } from "@/lib/mediapipe/schema";
 
 const WS_BASE = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:8000/api/v1/live";
 
-export interface ClientLandmarkFrame {
-  timestampMs: number;
-  landmarks: Array<{ x: number; y: number; z: number }>;
-}
-
-function normalizeFrame(frame: ClientLandmarkFrame) {
-  const centroid = frame.landmarks.reduce(
-    (acc, point) => {
-      acc.x += point.x;
-      acc.y += point.y;
-      acc.z += point.z;
-      return acc;
-    },
-    { x: 0, y: 0, z: 0 },
-  );
-
-  const length = frame.landmarks.length || 1;
-  const mean = { x: centroid.x / length, y: centroid.y / length, z: centroid.z / length };
-
-  return {
-    timestamp_ms: frame.timestampMs,
-    points: frame.landmarks.map((point) => ({
-      x: point.x - mean.x,
-      y: point.y - mean.y,
-      z: point.z - mean.z,
-    })),
-  };
-}
+/** v1 live frame: 258 normalized features + timestamp + missing flags. */
+export type { FrameV1 };
 
 export function useLiveWebSocket(context: AppContext) {
   const socketRef = useRef<WebSocket | null>(null);
@@ -99,8 +74,11 @@ export function useLiveWebSocket(context: AppContext) {
   }, [connect]);
 
   const sendSequence = useCallback(
-    (frames: ClientLandmarkFrame[]) => {
+    (frames: FrameV1[]) => {
       if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
+        return;
+      }
+      if (frames.length === 0) {
         return;
       }
 
@@ -108,7 +86,14 @@ export function useLiveWebSocket(context: AppContext) {
         JSON.stringify({
           type: "landmark_sequence",
           context,
-          sequence: frames.map(normalizeFrame),
+          feature_version: FEATURE_VERSION,
+          feature_count: FEATURE_COUNT,
+          sequence: frames.map((frame) => ({
+            timestamp_ms: frame.timestamp_ms,
+            feature_version: FEATURE_VERSION,
+            feature_count: FEATURE_COUNT,
+            features: frame.features,
+          })),
         }),
       );
     },

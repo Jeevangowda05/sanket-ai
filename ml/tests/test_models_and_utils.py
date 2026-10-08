@@ -63,3 +63,53 @@ def test_model_loader_unavailable_without_weights(tmp_path: Path) -> None:
     )
     assert result.status == "unavailable"
     assert result.model is None
+
+
+def _write_checkpoint(path: Path, **overrides) -> None:
+    model = TCNModel(input_size=258, num_classes=3)
+    metadata = {
+        "architecture": "tcn",
+        "input_size": 258,
+        "num_classes": 3,
+        "feature_version": "v1",
+        "feature_count": 258,
+        "label_mapping": {"a": 0, "b": 1, "c": 2},
+    }
+    metadata.update(overrides)
+    torch.save({"state_dict": model.state_dict(), **metadata}, path)
+
+
+def test_model_loader_accepts_matching_v1_checkpoint(tmp_path: Path) -> None:
+    path = tmp_path / "v1.pt"
+    _write_checkpoint(path)
+    result = load_model_if_available(
+        architecture="tcn",
+        weights_path=path,
+        input_size=258,
+        num_classes=3,
+    )
+    assert result.status == "available"
+    assert result.model is not None
+
+
+def test_model_loader_rejects_contract_mismatch(tmp_path: Path) -> None:
+    path = tmp_path / "v1.pt"
+    _write_checkpoint(path)
+
+    wrong_version = tmp_path / "v2.pt"
+    _write_checkpoint(wrong_version, feature_version="v2")
+
+    no_mapping = tmp_path / "nomap.pt"
+    model = TCNModel(input_size=258, num_classes=3)
+    torch.save({"state_dict": model.state_dict()}, no_mapping)
+
+    cases = [
+        # input_size must equal the v1 feature count.
+        dict(weights_path=path, input_size=12, num_classes=3),
+        dict(weights_path=wrong_version, input_size=258, num_classes=3),
+        dict(weights_path=no_mapping, input_size=258, num_classes=3),
+    ]
+    for case in cases:
+        result = load_model_if_available(architecture="tcn", **case)
+        assert result.status == "unavailable"
+        assert result.model is None

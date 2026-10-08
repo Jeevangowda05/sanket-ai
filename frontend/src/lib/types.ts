@@ -15,21 +15,26 @@ export interface CatalogResponse {
   items: CatalogEntry[];
 }
 
-export interface LandmarkPoint {
-  x: number;
-  y: number;
-  z: number;
-  visibility?: number;
-}
-
-export interface LandmarkFrame {
+export interface FeatureFrame {
   timestamp_ms: number;
-  points: LandmarkPoint[];
+  feature_version: "v1";
+  feature_count: 258;
+  features: number[];
 }
 
 export interface PredictRequest {
   context: AppContext;
-  sequence: LandmarkFrame[];
+  feature_version: "v1";
+  feature_count: 258;
+  sequence: FeatureFrame[];
+}
+
+export interface LiveIncomingMessage {
+  type: "landmark_sequence";
+  context: AppContext;
+  feature_version: "v1";
+  feature_count: 258;
+  sequence: FeatureFrame[];
 }
 
 export interface PredictionCandidate {
